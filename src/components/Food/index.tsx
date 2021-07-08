@@ -1,44 +1,43 @@
-import { useState } from 'react';
-import { FiEdit3, FiTrash } from 'react-icons/fi';
+import React, { useState } from 'react';
 
-import { Container } from './styles';
+import { FiEdit3, FiTrash } from 'react-icons/fi';
 import api from '../../services/api';
 
-interface FoodProps {
-  food: {
-    id: number
-    name: string
-    description: string
-    image: string
-    price: number
-    available: boolean
-  }
-  handleEditFood: ({
-    id,
-    available,
-  }: {
-    id: number
-    available: boolean
-  }) => void
-  handleDelete: (id: number) => void
+import { Container } from './styles';
+
+interface FoodPlate {
+  id: number;
+  name: string;
+  image: string;
+  price: string;
+  description: string;
+  available: boolean;
 }
 
-export default function Food({ food, handleEditFood, handleDelete }: FoodProps) {
-  const [isAvailable, setIsAvailable] = useState(food.available)
+interface FoodProps {
+  food: FoodPlate;
+  handleDelete: (id: number) => {};
+  handleEditFood: (food: FoodPlate) => void;
+}
 
-  async function toggleAvailable() {
+export default function Food({ food, handleDelete, handleEditFood }: FoodProps) {  
+  const [isAvailable, setIsAvailable] = useState(food.available);
+
+  async function toggleAvailable(): Promise<void> {
+    // TODO UPDATE STATUS (available)
     await api.put(`/foods/${food.id}`, {
       ...food,
       available: !isAvailable,
-    })
+    }).catch(
+      //erro
+    )
+    setIsAvailable(!isAvailable);
+  };
 
-    setIsAvailable((prevState) => !prevState)
+
+  function setEditingFood(): void {
+    handleEditFood(food);
   }
-
-  function setEditingFood() {
-    handleEditFood(food)
-  }
-
 
   return (
     <Container available={isAvailable}>
@@ -57,7 +56,7 @@ export default function Food({ food, handleEditFood, handleDelete }: FoodProps) 
           <button
             type="button"
             className="icon"
-            onClick={setEditingFood}
+            onClick={() => setEditingFood()}
             data-testid={`edit-food-${food.id}`}
           >
             <FiEdit3 size={20} />
